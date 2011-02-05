@@ -1,0 +1,154 @@
+#! /bin/bash
+
+## by dmn, http://devsite.pl
+
+
+
+#### http://ffmpeg.mplayerhq.hu/faq.html#SEC26
+## 3.14 How do I encode videos which play on the PSP?
+
+## `needed stuff'
+##     -acodec libfaac -vcodec mpeg4 width*height<=76800 width%16=0 height%16=0 -ar 24000 -r 30000/1001 or 15000/1001 -f psp
+## `working stuff'
+##     4mv, title
+## `non-working stuff'
+##     B-frames
+## `example command line'
+##     ffmpeg -i input -acodec libfaac -ab 128kb -vcodec mpeg4 -b 1200kb -ar 24000 -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 368x192 -r 30000/1001 -title X -f psp output.mp4
+## `needed stuff for H.264'
+##     -acodec libfaac -vcodec h264 width*height<=76800 width%16=0? height%16=0? -ar 48000 -coder 1 -r 30000/1001 or 15000/1001 -f psp
+## `working stuff for H.264'
+##     title, loop filter
+## `non-working stuff for H.264'
+##     CAVLC
+## `example command line'
+##     ffmpeg -i input -acodec libfaac -ab 128kb -vcodec h264 -b 1200kb -ar 48000 -mbd 2 -coder 1 -cmp 2 -subcmp 2 -s 368x192 -r 30000/1001 -title X -f psp -flags loop -trellis 2 -partitions parti4x4+parti8x8+partp4x4+partp8x8+partb8x8 output.mp4
+
+
+#### http://www.yogarine.net/2007/12/converting-video-for-psp-on-linux.html
+##    * MPEG-4 File Format
+##    * MPEG-4 AVC Video codec
+##          o H.264 Main Profile up to Level 3.0
+##          o Any framerate up to 30 fps
+##          o Up to 2 reference frames
+##          o Arithmetic Coding (CABAC)
+##          o Width/Height must be a multiple of 16
+##          o Allowed Resolutions:
+##                + Any resolution up to 320x240
+##                + 352x240 (VCD)
+##                + 352x480 (CVD)
+##                + 480x272 (Native)
+##                + 720x480 (DVD)
+##          o No 8x8 transform
+##          o No reference b-frames
+##    * MPEG-4 AAC Audio codec
+##          o 48000 kHz
+
+#### http://rob.opendot.cl/index.php/useful-stuff/psp-video-guide/
+#### http://brainwagon.org/2005/12/25/using-ffmpeg-to-make-psp-video/
+#### http://ubuntuforums.org/showthread.php?s=71e8ca79ec49dc006362e57e4e5b9ba3&t=552133&page=2
+#### http://www.linuxquestions.org/questions/linux-software-2/ffmpeg-psp-encoding-woes-with-a-solution-619247/
+#### http://corley.kinnane.net/blog/2008/06/22/psp-encode/
+#### http://wiki.multimedia.cx/index.php?title=MPlayer_FAQ#Encoding_to_PSP.2FiPod.2FOther_Devices
+#### http://movingparts.net/2007/12/10/mencoder-dvd-rip-volume-increase-your-psp-and-you/
+
+wyjscie="$2"
+if [[ $wyjscie == "" ]] ; then
+	wyjscie="output.mp4"
+fi
+
+## ffmpeg -i "$1" -acodec aac -ab 64kb -vcodec mpeg4 -b 1200kb -ar 24000 -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 368x192 -r 30000/1001 -title `basename "$1"` -f psp `basename "$1"``date +%N`.mp4
+
+## ffmpeg -i "$1" -acodec aac -ab 48kb -vcodec mpeg4 -b 400kb -ar 24000 -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 368x208 -title `basename "$1"` -f psp `basename "$1"``date +%N`.mp4
+
+
+## mencoder presto.avi -sub presto.txt -fontconfig -subfont-text-scale 3 -subpos 85 -subcp cp1250 -subfont-encoding unicode -font ~/.mplayer/subfont.ttf -oac lavc -ovc lavc -of lavf -lavcopts aglobal=1:vglobal=1:vcodec=mpeg4:vbitrate=500:acodec=libfaac:abitrate=48 -af lavcresample=24000 -vf scale=368:208,harddup -lavfopts format=psp -ofps 30000/1001 -info name="tytul" -o prestomencoder.mp4
+
+DEBUGSTR="----> "
+napisy=""
+
+napisy() {
+	napisy=`echo "$1" | sed -e s/...$/txt/`
+	if [[ -e "$napisy" ]] ; then
+		echo "${DEBUGSTR}napisy: $napisy"
+	else
+		echo "${DEBUGSTR}brak napisow"
+		napisy=""
+	fi
+}
+
+koduj_szybko() {
+	opcje=""
+
+	opcje="${opcje} -oac lavc -ovc lavc -of lavf -lavcopts aglobal=1:vglobal=1:vcodec=mpeg4:vbitrate=300:acodec=libfaac:abitrate=48:threads=2 -af lavcresample=24000 -vf scale=368:208,harddup -lavfopts format=psp"
+
+	napisy "$1"
+	#opcje="${opcje}${napisy}"
+
+	#opcje="${opcje} -ofps 24000/1001"
+	#opcje="${opcje} -ofps 30000/1001"
+
+	#tytul=`basename "$1"`; opcje="${opcje} -info name=$tytul"
+
+	wyjscie=`basename "$1"``date +%N`.mp4
+	#opcje="${opcje} -o $wyjscie"
+
+
+
+	if [[ $napisy == "" ]] ; then
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -o "$wyjscie"
+	else
+		napisyconf="-fontconfig -subfont-text-scale 3 -subpos 100 -subcp cp1250 -subfont-encoding unicode -font ~/.mplayer/subfont.ttf"
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -sub \"$napisy\" $napisyconf -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -sub "$napisy" $napisyconf -o "$wyjscie"
+	fi
+}
+
+koduj_ladnie() {
+	opcje="$1"
+
+	napisy "$1"
+	opcje="${opcje}${napisy}"
+
+	opcje="${opcje} -sws 9 -vf scale=480:-10,harddup,unsharp=l3x3:0.7,expand=480:272 -oac faac -faacopts br=64:mpeg=4:object=2:raw -ovc x264 -x264encopts bitrate=300:global_header:partitions=all:trellis=1:vbv_maxrate=512:vbv_bufsize=20000:level_idc=30:threads=0 -of lavf -lavfopts format=psp"
+
+	#tytul=`basename "$1"`; opcje="${opcje} -info name=$tytul"
+
+	wyjscie=`basename "$1"``date +%N`.mp4
+	opcje="${opcje} -o $wyjscie"
+
+	echo "${DEBUGSTR}nice -19 mencoder $opcje"
+	echo "---------------------------------------------------------------------"
+
+	nice -19 mencoder $opcje
+}
+
+#mencoder -sws 9 -vf scale=480:-10,harddup,unsharp=l3x3:0.7,expand=480:272 -oac faac -faacopts br=128:mpeg=4:object=2:raw -ovc x264 -x264encopts bitrate=650:global_header:partitions=all:trellis=1:vbv_maxrate=768:vbv_bufsize=2000:level_idc=30 -of lavf -lavfopts format=psp presto.avi -o presto480.mp4
+
+# mencoder -sws 9 -vf scale=480:-10,harddup,unsharp=l3x3:0.7,expand=480:272 -oac faac -faacopts br=64:mpeg=4:object=2:raw -ovc x264 -x264encopts bitrate=300:global_header:partitions=all:trellis=1:vbv_maxrate=512:vbv_bufsize=20000:level_idc=30 -of lavf -lavfopts format=psp -sub *txt -fontconfig -subfont-text-scale 3 -subpos 100 -subcp cp1250 -subfont-encoding unicode -font ~/.mplayer/subfont.ttf *avi -o presto480.mp4
+
+wypisz() {
+	echo "${DEBUGSTR}wypisz: `pwd` $*"
+}
+
+typ=0
+
+if [[ $1 == "--ladnie" || $1 == "-9" ]]; then
+	typ=9
+	shift
+elif  [[ $1 == "--szybko" || $1 == "-0" ]]; then
+	typ=0
+	shift
+fi
+
+echo "${DEBUGSTR}typ: $typ"
+while [[ "" != $1 ]]; do
+	case $typ in
+		0) koduj_szybko $1 ;;
+		9) koduj_ladnie $1 ;;
+	esac
+	shift
+done
