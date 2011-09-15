@@ -16,3 +16,4 @@ else
 	echo "`basename $0` [device]"
 	exit 1
 fi
+### su -c 'umount /media/truecrypt1 && truecrypt -d && rm -rf /tmp/.truecrypt_aux_mnt1/'

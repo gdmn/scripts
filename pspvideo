@@ -77,10 +77,62 @@ napisy() {
 	fi
 }
 
+koduj_flv() {
+	opcje=""
+
+	#opcje="${opcje} -mc 0 -vf scale=320:240,harddup -ofps 25 -srate 44100 -oac mp3lame -lameopts vbr=2:q=8:aq=1:br=96 -ovc lavc -of lavf -lavfopts format=flv -lavcopts vcodec=flv:vbitrate=236:mbd=2:mv0:trell:v4mv:cbp:last_pred=3"
+	opcje="${opcje} -mc 0 -vf scale=320:240,harddup -ofps 25 -srate 22050 -oac mp3lame -lameopts cbr=2:mode=3:br=48 -ovc lavc -of lavf -lavfopts format=flv -lavcopts vcodec=flv:vbitrate=236:mbd=2:mv0:trell:v4mv:cbp:last_pred=3"
+
+	napisy "$1"
+
+	wyjscie=`basename "$1"``date +%N`.flv
+
+	if [[ $napisy == "" ]] ; then
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -o "$wyjscie"
+	else
+		napisyconf="-fontconfig -subfont-text-scale 3 -subpos 100 -subcp cp1250 -subfont-encoding unicode -font ~/.mplayer/subfont.ttf"
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -sub \"$napisy\" $napisyconf -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -sub "$napisy" $napisyconf -o "$wyjscie"
+	fi
+}
+
 koduj_szybko() {
 	opcje=""
 
 	opcje="${opcje} -oac lavc -ovc lavc -of lavf -lavcopts aglobal=1:vglobal=1:vcodec=mpeg4:vbitrate=300:acodec=libfaac:abitrate=48:threads=2 -af lavcresample=24000 -vf scale=368:208,harddup -lavfopts format=psp"
+
+	napisy "$1"
+	#opcje="${opcje}${napisy}"
+
+	#opcje="${opcje} -ofps 24000/1001"
+	#opcje="${opcje} -ofps 30000/1001"
+
+	#tytul=`basename "$1"`; opcje="${opcje} -info name=$tytul"
+
+	wyjscie=`basename "$1"``date +%N`.mp4
+	#opcje="${opcje} -o $wyjscie"
+
+
+
+	if [[ $napisy == "" ]] ; then
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -o "$wyjscie"
+	else
+		napisyconf="-fontconfig -subfont-text-scale 3 -subpos 100 -subcp cp1250 -subfont-encoding unicode -font ~/.mplayer/subfont.ttf"
+		echo "${DEBUGSTR}nice -19 mencoder \"$1\" $opcje -sub \"$napisy\" $napisyconf -o \"$wyjscie\""
+		echo "---------------------------------------------------------------------"
+		nice -19 mencoder "$1" $opcje -sub "$napisy" $napisyconf -o "$wyjscie"
+	fi
+}
+
+koduj_szybko_tel() {
+	opcje=""
+
+	opcje="${opcje} -oac lavc -ovc lavc -of lavf -lavcopts aglobal=1:vglobal=1:vcodec=mpeg4:vbitrate=300:acodec=libfaac:abitrate=48:threads=2 -af lavcresample=24000 -vf scale=320:240,harddup -lavfopts format=psp"
 
 	napisy "$1"
 	#opcje="${opcje}${napisy}"
@@ -142,13 +194,21 @@ if [[ $1 == "--ladnie" || $1 == "-9" ]]; then
 elif  [[ $1 == "--szybko" || $1 == "-0" ]]; then
 	typ=0
 	shift
+elif  [[ $1 == "--flv" || $1 == "-1" ]]; then
+	typ=1
+	shift
+elif  [[ $1 == "--tel" || $1 == "-2" ]]; then
+	typ=2
+	shift
 fi
 
 echo "${DEBUGSTR}typ: $typ"
 while [[ "" != $1 ]]; do
 	case $typ in
-		0) koduj_szybko $1 ;;
-		9) koduj_ladnie $1 ;;
+		0) koduj_szybko "$1" ;;
+		9) koduj_ladnie "$1" ;;
+		1) koduj_flv "$1" ;;
+		2) koduj_szybko_tel "$1" ;;
 	esac
 	shift
 done

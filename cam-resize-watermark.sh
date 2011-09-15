@@ -7,7 +7,7 @@ PX="1280"
 QUALITY="70"
 
 helpme() {
-	echo "$0 [-t text] file1 file2 file3...."
+	echo "$0 [-t text] [-s sizeinpixels] file1 file2 file3...."
 }
 
 processfile() {
@@ -22,7 +22,7 @@ processfile() {
 fill black text 12,12 '$TEXT'
 fill white text 10,10 '$TEXT'" "${NEWNAME}"
 	else
-		convert "$1" -resize 1280x1280 -quality "${QUALITY}%" "${NEWNAME}"
+		convert "$1" -resize "${PX}x${PX}" -quality "${QUALITY}%" "${NEWNAME}"
 	fi
 }
 
@@ -34,6 +34,12 @@ fi
 if [[ "-t" == $1 ]]; then
 	shift
 	TEXT="$1"
+	shift
+fi
+
+if [[ "-s" == $1 ]]; then
+	shift
+	PX="$1"
 	shift
 fi
 
