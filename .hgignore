@@ -1,1 +1,6 @@
-.*\.class
+syntax: glob
+
+
+*~
+*.class
+*.swp
