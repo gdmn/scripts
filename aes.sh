@@ -4,16 +4,21 @@
 # HELP
 
 usage() {
-	echo "Usage:"
+	echo -e "Usage examples:\n"
+	echo -e "encrypt: \tPASSWORD=abc `basename $0` -e somefile anotherfile directory/"
+	echo -e "decrypt: \tPASSWORD=abc `basename $0` -d encrypted.tar.aes"
+	echo -e "list:    \tPASSWORD=abc `basename $0` -l encrypted.tar.aes"
 	echo ""
-	echo "- encrypt"
-	echo -e "\tPASSWORD=abc `basename $0` -e somefile anotherfile directory/"
-	echo ""
-	echo "- decrypt"
-	echo -e "\tPASSWORD=abc `basename $0` -d encrypted.tar.aes"
-	echo ""
-	echo "- list"
-	echo -e "\tPASSWORD=abc `basename $0` -l encrypted.tar.aes"
+	echo "Arguments:"
+	echo -e "\t-e  \t--encrypt     \tencrypt given file(s) to current directory or file specified with \"-o\" argument"
+	echo -e "\t-d  \t--decrypt     \tdecrypt given file(s) to current directory"
+	echo -e "\t-l  \t--list        \tlist content of the file"
+	echo -e "\t-r  \t--random      \tgenerate random password for encrypt"
+	echo -e "\t    \t              \timplies \"-s\""
+	echo -e "\t-s  \t--statusfile  \tgenerate information file with password during encrypt"
+	echo -e "\t-o  \t--output      \tuse given file as output for encryption"
+	echo -e "\nNotes:\n- if \${PASSWORD} environment variable is not set and \"-r\" is not given, password is read from stdin"
+
 }
 
 ########################################################################
@@ -29,8 +34,12 @@ if [ ! -x `which pv` ]; then
 fi
 
 PASSWORD="${PASSWORD}"
+GENERATEINFO=
 #OUTPUTFILE=
 OUTPUTFILE="`pwd`/encrypted_`date +%N`.tar.aes"
+INFOFILE="${OUTPUTFILE}.info"
+PASSWORDARGUMENTS=
+CRYPTARGUMENTS="aes-256-cbc -salt"
 
 ########################################################################
 # CLEANUP
@@ -48,6 +57,7 @@ control_c() {
 	if [ -f ${OUTPUTFILE} ]; then
 		echo "removing ${OUTPUTFILE}"
 		rm -f ${OUTPUTFILE}
+		rm -f ${INFOFILE}
 	fi
 	cleanup
 	exit $?
@@ -59,16 +69,18 @@ control_c() {
 encrypt() {
 	cd .
 	echo "Result: ${OUTPUTFILE}"
+	if [[ "1" == "${GENERATEINFO}" ]]; then
+		echo "Result: ${OUTPUTFILE}" >> ${INFOFILE}
+	fi
 
 	#echo "tar -zcvf - $*"
 	#tar -cf - . | pv -s $(du -sb . | awk '{print $1}') | gzip > out.tgz
 	SIZE=$( du -scb $* | tail -1 | awk '{print $1}' )
-	#SIZE=$(( ${SIZE}*1024/1000 ))
 	tar -cf - $* | \
 		pv -s $SIZE | \
 		gzip | \
 		R="${PASSWORD}" \
-			openssl aes-256-cbc -salt -pass 'env:R' | \
+				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
 		dd of=${OUTPUTFILE}
 }
 
@@ -80,7 +92,7 @@ decrypt() {
 		echo "Decrypting of $1"
 		pv "$1" | \
 			R="${PASSWORD}" \
-				openssl aes-256-cbc -d -salt -pass 'env:R'  | \
+				openssl ${CRYPTARGUMENTS} -d ${PASSWORDARGUMENTS} | \
 			tar -zx
 		shift
 	done
@@ -94,7 +106,7 @@ list() {
 		echo "Listing of $1"
 		cat "$1" | \
 			R="${PASSWORD}" \
-				openssl aes-256-cbc -d -salt -pass 'env:R'  | \
+				openssl ${CRYPTARGUMENTS} -d ${PASSWORDARGUMENTS} | \
 			tar -zt
 		shift
 	done
@@ -109,7 +121,12 @@ while [[ "$1" ]]; do
 	case $1 in
 		-r | --random)
 			PASSWORD="`openssl rand -base64 32`"
-			echo "Using random password: ${PASSWORD}"
+			GENERATEINFO='1'
+			date | tee -a ${INFOFILE}
+			echo "Using random password: ${PASSWORD}" | tee -a ${INFOFILE}
+		;;
+		-s | --statusfile)
+			GENERATEINFO='1'
 		;;
 		-o )
 			shift
@@ -160,8 +177,13 @@ while [[ "$1" ]]; do
 done
 
 if [[ "${PASSWORD}" == "" ]]; then
-	echo "Assign \${PASSWORD} environment variable!"
-	exit 2
+	echo "Note, that you can assign \${PASSWORD} environment variable"
+	#exit 2
+fi
+
+PASSWORDARGUMENTS="-pass env:R"
+if [[ "" == "${PASSWORD}" ]]; then
+	PASSWORDARGUMENTS=
 fi
 
 if [[ $CMD ]]; then
