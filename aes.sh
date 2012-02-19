@@ -36,7 +36,7 @@ fi
 PASSWORD="${PASSWORD}"
 GENERATEINFO=
 #OUTPUTFILE=
-OUTPUTFILE="`pwd`/encrypted_`date +%N`.tar.aes"
+OUTPUTFILE="`pwd`/encrypted_`date +%Y%m%d_%H%M%S`.tar.aes"
 INFOFILE="${OUTPUTFILE}.info"
 PASSWORDARGUMENTS=
 CRYPTARGUMENTS="aes-256-cbc -salt"
@@ -68,13 +68,12 @@ control_c() {
 
 encrypt() {
 	cd .
-	echo "Result: ${OUTPUTFILE}"
 	if [[ "1" == "${GENERATEINFO}" ]]; then
-		echo "Result: ${OUTPUTFILE}" >> ${INFOFILE}
+		echo "Result: ${OUTPUTFILE} with ${INFOFILE}" | tee -a ${INFOFILE}
+	else
+		echo "Result: ${OUTPUTFILE}"
 	fi
 
-	#echo "tar -zcvf - $*"
-	#tar -cf - . | pv -s $(du -sb . | awk '{print $1}') | gzip > out.tgz
 	SIZE=$( du -scb $* | tail -1 | awk '{print $1}' )
 	tar -cf - $* | \
 		pv -s $SIZE | \
