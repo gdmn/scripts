@@ -175,11 +175,6 @@ while [[ "$1" ]]; do
 	shift
 done
 
-if [[ "${PASSWORD}" == "" ]]; then
-	echo "Note, that you can assign \${PASSWORD} environment variable"
-	#exit 2
-fi
-
 PASSWORDARGUMENTS="-pass env:R"
 if [[ "" == "${PASSWORD}" ]]; then
 	PASSWORDARGUMENTS=
@@ -187,6 +182,9 @@ fi
 
 if [[ $CMD ]]; then
 	echo "Running: $CMD $*"
+	if [[ "${PASSWORD}" == "" ]]; then
+		echo "Note, that you can assign \${PASSWORD} environment variable"
+	fi
 	$CMD $*
 	RESULT=$?
 	echo "Result of ${CMD}: ${RESULT}"
