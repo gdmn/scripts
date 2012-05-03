@@ -28,7 +28,7 @@ fi
 OPERATION="$1"
 shift
 
-while [[ "" != $1 ]]; do
+while [[ "" != "$1" ]]; do
 	if [ -f "$1" ]; then
 		processfile $OPERATION "$1"
 	else

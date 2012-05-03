@@ -1,6 +1,8 @@
 #! /bin/bash
 
 ## by dmn, http://devsite.pl
+# pdf:
+# pdftoppm *pdf pliczek; for file in *.ppm; do convert -quality 60 $file ${file/.ppm/.jpg}; done
 
 TEXT=""
 PX="1280"
@@ -26,24 +28,24 @@ fill white text 10,10 '$TEXT'" "${NEWNAME}"
 	fi
 }
 
-if [[ $1 == "" ]]; then
+if [[ "$1" == "" ]]; then
 	helpme
 	exit 1
 fi
 
-if [[ "-t" == $1 ]]; then
+if [[ "-t" == "$1" ]]; then
 	shift
 	TEXT="$1"
 	shift
 fi
 
-if [[ "-s" == $1 ]]; then
+if [[ "-s" == "$1" ]]; then
 	shift
 	PX="$1"
 	shift
 fi
 
-while [[ "" != $1 ]]; do
+while [[ "" != "$1" ]]; do
 	if [ -f "$1" ]; then
 		processfile "$1"
 	else

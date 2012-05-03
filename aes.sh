@@ -24,11 +24,11 @@ usage() {
 ########################################################################
 # INIT
 
-if [ ! -x `which openssl` ]; then
+if [[ "" == "`which openssl`" ]]; then
 	echo 'install openssl!'
 	exit 3
 fi
-if [ ! -x `which pv` ]; then
+if [[ "" == "`which pv`" ]]; then
 	echo 'install pv (pipeviewer)!'
 	exit 3
 fi

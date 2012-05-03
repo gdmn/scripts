@@ -1,0 +1,4 @@
+#! /bin/bash
+
+find . -xdev -type f -print0 | xargs -0 -I % grep --color -H -n $* "%"
+
