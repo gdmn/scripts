@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+
+## configuration:
+# name of vbox machine:
+MACHINENAME='livecd'
+# get version of vbox, e.g. 4.2.4-1
+VIRTUALBOX_VERSION=$(pacman -Q virtualbox|awk {'print $2'}|sed 's/\-.\+//')
+# get version of kernel, e.g. 3.6.5-1-ck/x86_64
+KERNEL_VERSION=$(uname -rm|sed 's/\ /\//')
+
+if [[ `lsmod | grep vboxdrv | wc -l` -ge 1 ]] ; then
+	echo 'Ok, vboxdrv loaded already'
+else
+	echo "Virtualbox version = $VIRTUALBOX_VERSION, kernel version = $KERNEL_VERSION"
+	echo 'Running: sudo modprobe vboxdrv'
+	sudo modprobe vboxdrv || ( \
+		echo 'Running: sudo install install vboxhost' && \
+		sudo dkms install vboxhost/$VIRTUALBOX_VERSION -k $KERNEL_VERSION && \
+		sudo modprobe vboxdrv )
+fi
+
+CONTROLLERNAME=$(VBoxManage showvminfo $MACHINENAME  | grep 'Storage Controller ' | grep '(0)' | grep 'Name' | sed 's/.*://' | sed 's/^ *//g')
+
+pushd "`dirname $1`" > /dev/null
+DIRNAME="`pwd`"
+FILENAME="`basename $1`"
+popd > /dev/null
+
+echo "Attaching \"$DIRNAME/$FILENAME\" to \"$CONTROLLERNAME\" on \"$MACHINENAME\""
+VBoxManage storageattach $MACHINENAME --storagectl "$CONTROLLERNAME" \
+	--port 1 --device 0 --type dvddrive --medium "$DIRNAME/$FILENAME" && \
+	VBoxManage startvm livecd
