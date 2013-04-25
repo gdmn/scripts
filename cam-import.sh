@@ -3,7 +3,7 @@
 ## by dmn, http://devsite.pl
 
 
-DESTINATION="/home/dmn/Obrazy/foto"
+DESTINATION="/mnt/domowe/foto"
 
 helpme() {
 	echo "$0 mv|cp file1 file2 file3...."
@@ -24,6 +24,8 @@ else
 	helpme
 	exit 1
 fi
+
+ls $DESTINATION > /dev/null
 
 OPERATION="$1"
 shift
