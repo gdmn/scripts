@@ -8,7 +8,7 @@ PWDFILE="${POINT}/.mountCifs"
 
 if [ "$#" != "1" ]; then
 	N=`basename "$0"`
-	echo "Usage: $N [-a] share"
+	echo "Usage: $N share"
 	echo ""
 	echo "Mount Samba Share"
 	echo ""
