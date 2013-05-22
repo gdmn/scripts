@@ -30,7 +30,7 @@ fi
 while (( "$#" )); do
 	#[[ ! -z $i ]] && continue
 	NAME=`basename "$1"`
-	echo "adding $NAME"
+	#echo "adding $NAME"
 	cp -f -v "$1" "${BUFDIR}/"
 	mocp -a "${BUFDIR}/${NAME}"
 	shift
