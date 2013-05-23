@@ -1,0 +1,31 @@
+#! /bin/bash
+
+# http://stackoverflow.com/questions/3432536/create-session-if-none-exists
+
+# ~/bin/tmux-myproject shell script
+# The Project name is also used as a session name (usually shorter)
+
+if [ $# -ne 1 ] ; then
+	echo "$0 name"
+	exit 1
+fi
+
+NAME="$1"
+
+tmux has-session -t "$NAME" 2>/dev/null
+if [ "$?" -eq 1 ] ; then
+	echo "No Session found. Creating and configuring."
+	tmux new-session -d -s "$NAME"
+	CONF="${HOME}/.tmux-${NAME}.conf"
+	if [ -f $CONF ]; then
+		echo "Applying configuration ${CONF}."
+		tmux source-file "${CONF}"
+	else
+		echo "Configuration ${CONF} not found."
+	fi
+else
+	echo "Session found."
+fi
+
+echo "Connecting."
+tmux attach-session -t "$NAME"
