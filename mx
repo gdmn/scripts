@@ -15,10 +15,11 @@ NAME="$1"
 tmux has-session -t "$NAME" 2>/dev/null
 if [ "$?" -eq 1 ] ; then
 	echo "No Session found. Creating and configuring."
-	tmux new-session -d -s "$NAME"
+	tmux -2 new-session -d -s "$NAME"
 	CONF="${HOME}/.tmux-${NAME}.conf"
 	if [ -f $CONF ]; then
 		echo "Applying configuration ${CONF}."
+		tmux source-file "${HOME}/.tmux.conf"
 		tmux source-file "${CONF}"
 	else
 		echo "Configuration ${CONF} not found."
@@ -28,4 +29,4 @@ else
 fi
 
 echo "Connecting."
-tmux attach-session -t "$NAME"
+tmux -2 attach-session -t "$NAME"
