@@ -1,13 +1,35 @@
 #! /usr/bin/env bash
 
-# https://api.bitbucket.org/1.0/users/dmn/?format=xml
+# script source:
+# https://bitbucket.org/dmn/scripts/src/tip/bbrepolist.sh
+
+# by dmn
 
 USER='dmn'
 REPOSITORIES=
 RAW=0
 
+usage() {
+	echo -e "Generate HTML page witch all public reposiories of given user.\n"
+	echo -e "Usage examples:"
+	echo -e "\t`basename $0` dmn > repositories.html"
+	echo ""
+	echo "Arguments:"
+	echo -e "\tname  \tuser name"
+	echo -e "\t--raw \tdo not use markdown processor"
+	echo -e "\t--help\tshow short help"
+}
+
+if [ $# -eq 0 ]; then
+	usage
+	exit 1
+fi
+
 while [ $# -gt 0 ]; do
-	if [ "--raw" == "$1" ]; then
+	if [ "--help" == "$1" ]; then
+		usage
+		exit 1
+	elif [ "--raw" == "$1" ]; then
 		RAW=1
 	else
 		USER="$1"
