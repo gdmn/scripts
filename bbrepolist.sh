@@ -3,6 +3,9 @@
 # script source:
 # https://bitbucket.org/dmn/scripts/src/tip/bbrepolist.sh
 
+# neat usage example:
+# u='dmn'; s='bbrepolist.sh'; wget -q "https://bitbucket.org/dmn/scripts/raw/tip/$s" && chmod +x $s && ./$s $u > list.html
+
 # by dmn
 
 USER='dmn'
