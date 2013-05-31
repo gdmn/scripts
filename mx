@@ -6,7 +6,11 @@
 # The Project name is also used as a session name (usually shorter)
 
 if [ $# -ne 1 ] ; then
+	echo 'Usage:'
 	echo "$0 name"
+	echo ''
+	echo 'List sessions:'
+	tmux list-sessions
 	exit 1
 fi
 
