@@ -10,7 +10,7 @@
 
 USER='dmn'
 REPOSITORIES=
-HOMEPAGE=
+HOMEPAGE='http://devsite.pl'
 RAW=0
 
 usage() {
@@ -63,7 +63,11 @@ cat << EOF
 	<link href="http://dmn.bitbucket.org/css/poole.css" rel="stylesheet"></link>
 </head><body>
 <div id="box">
-<div id="header"><h1>${1}</h1></div>
+<div id="header"><h1><a href="/">${1}</a></h1></div>
+	<div id="menu">
+	<span class="current"><a href="/">projects</a></span>
+    <span class=""><a href="${HOMEPAGE}">homepage</a></span>
+    </div>
 <div id="content">
 EOF
 }
@@ -173,11 +177,7 @@ make_repositories() {
 if [ 1 == $RAW ]; then
 	make_repositories
 else
-	if [ "" != "$HOMEPAGE" ]; then
-		html_head "<a href=\"${HOMEPAGE}\">${USER} repositories</a>"
-	else
-		html_head "${USER} repositories"
-	fi
+	html_head "${USER} repositories"
 	make_repositories | markdown
 	html_tail
 fi
