@@ -10,6 +10,7 @@
 
 USER='dmn'
 REPOSITORIES=
+HOMEPAGE=
 RAW=0
 
 usage() {
@@ -18,9 +19,10 @@ usage() {
 	echo -e "\t`basename $0` dmn > repositories.html"
 	echo ""
 	echo "Arguments:"
-	echo -e "\tname  \tuser name"
-	echo -e "\t--raw \tdo not use markdown processor"
-	echo -e "\t--help\tshow short help"
+	echo -e "\tname     \tuser name"
+	echo -e "\t--raw    \tdo not use markdown processor"
+	echo -e "\t--www url\tadd link to user homepage"
+	echo -e "\t--help   \tshow short help"
 }
 
 if [ $# -eq 0 ]; then
@@ -32,6 +34,9 @@ while [ $# -gt 0 ]; do
 	if [ "--help" == "$1" ]; then
 		usage
 		exit 1
+	elif [ "--www" == "$1" ]; then
+		shift
+		HOMEPAGE="$1"
 	elif [ "--raw" == "$1" ]; then
 		RAW=1
 	else
@@ -168,7 +173,11 @@ make_repositories() {
 if [ 1 == $RAW ]; then
 	make_repositories
 else
-	html_head "${USER} repositories"
+	if [ "" != "$HOMEPAGE" ]; then
+		html_head "<a href=\"${HOMEPAGE}\">${USER} repositories</a>"
+	else
+		html_head "${USER} repositories"
+	fi
 	make_repositories | markdown
 	html_tail
 fi
