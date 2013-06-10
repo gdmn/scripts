@@ -102,10 +102,10 @@ xml_to_md() {
 
 	READMECODE=`curl -s -o /dev/null -I -w "%{http_code}" $READMEURL`
 	if [ "$READMECODE" -eq "200" ] ; then
-		#echo OK
+		#echo Readme OK
 		READMEFILE="README-${name}.html"
 		if [ 1 == $RAW ]; then
-			curl -s "$READMEURL" > "${READMEFILE}"
+			curl -s "$READMEURL" > "README-${name}.md"
 		else
 			html_head "$name readme" > "${READMEFILE}"
 			curl -s "$READMEURL" | markdown >> "${READMEFILE}"
