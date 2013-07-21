@@ -1,0 +1,3 @@
+#! /usr/bin/env sh
+
+gvim --servername VIMTAB --remote-tab $*
