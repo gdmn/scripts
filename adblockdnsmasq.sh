@@ -34,23 +34,36 @@ filter_dnsmasq() {
 	done
 }
 
+filter_nocomments() {
+	while read line; do
+		case "$line" in
+			'#'* )
+				;;
+			*'local'* )
+				;;
+			*) echo "$line"
+				;;
+		esac
+	done
+}
+
 fetch_hosts() {
 	for u in 'http://someonewhocares.org/hosts/hosts' ; do
-		curl --silent "$u" | filter_hosts_hosts
+		curl --silent "$u" | filter_nocomments | filter_hosts_hosts
 	done
 
 	for u in 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=dnsmasq&showintro=0&mimetype=plaintext' ; do
-		curl --silent "$u" | filter_dnsmasq_hosts
+		curl --silent "$u" | filter_nocomments | filter_dnsmasq_hosts
 	done
 }
 
 fetch() {
 	for u in 'http://someonewhocares.org/hosts/hosts' ; do
-		curl --silent "$u" | filter_hosts
+		curl --silent "$u" | filter_nocomments | filter_hosts
 	done
 
 	for u in 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=dnsmasq&showintro=0&mimetype=plaintext' ; do
-		curl --silent "$u" | filter_dnsmasq
+		curl --silent "$u" | filter_nocomments | filter_dnsmasq
 	done
 }
 
