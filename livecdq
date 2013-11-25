@@ -1,1 +1,1 @@
-qemu -enable-kvm -usbdevice tablet -soundhw ac97 -localtime -boot d -m 512 -cdrom $*
+qemu-system-x86_64 -enable-kvm -usbdevice tablet -soundhw ac97 -localtime -boot d -m 512 -cdrom $*
