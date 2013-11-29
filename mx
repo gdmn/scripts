@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # http://stackoverflow.com/questions/3432536/create-session-if-none-exists
 

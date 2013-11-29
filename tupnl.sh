@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 sudo netstat -tupnl | \
 	awk '{print($7);}' | \
