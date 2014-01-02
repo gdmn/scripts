@@ -82,7 +82,7 @@ EOF
 
 xml_bitbucket_reset() {
 	scm=
-	owner=
+	owner="$USER"
 	website=
 	description=
 	slug=
@@ -158,7 +158,12 @@ xml_parse_dom() {
 		utc_last_updated="$CONTENT"
 	elif [[ "$TAG_NAME" = "resource_uri" ]]; then
 		resource_uri="$CONTENT"
-		xml_to_md
+		# in case of "fork_of" or "mq_of" should be ommitted
+		if [[ "$owner" == "$USER" ]]; then
+			xml_to_md
+		else
+			xml_bitbucket_reset
+		fi
 	fi
 	#eval local $ATTRIBUTES
 	#echo "$website"
