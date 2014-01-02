@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 ## by dmn, http://devsite.pl
 # pdf:

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 IP='192.168.100.200'
 POINT='/home/user/smb'

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 ips=`ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | sed 's/.*inet addr://' | sed 's/ .*//' | sed 's/[0-9]*$//'`
 if [ "$ips" == "" ]; then

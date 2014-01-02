@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #sudo cp -f /media/Home/dmn/Projects/resolv.freenet.io.conf /etc/resolv.conf
 

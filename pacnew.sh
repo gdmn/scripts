@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 ## https://wiki.archlinux.org/index.php/Pacnew_and_Pacsave_Files
 
