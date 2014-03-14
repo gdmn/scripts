@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 
 # https://wiki.archlinux.org/index.php/Full_System_Backup_with_rsync
-CMD="rsync --one-file-system -aRXv --delete-during --delete-excluded"
+# --dry-run
+CMD="rsync --one-file-system -aRv --delete-after --delete-excluded"
 DEST=
 
 if [ -e /.backup-dest.conf ]; then
@@ -56,7 +57,7 @@ echo "`date '+%A, %d %B %Y, %T'`" > /.backup-timestamp
 START=$(date +%s)
 $CMD \
 -e "/usr/bin/ssh -p22 -i /.id_rsa" \
-/ /home/* "$DEST" \
+/ /home/dmn "$DEST" \
 '--exclude=*/.hg/*' \
 '--exclude=*/.git/*' \
 '--exclude=*/.svn/*' \
@@ -64,6 +65,8 @@ $CMD \
 '--exclude=*/man/*' \
 '--exclude=*/backup/*' \
 '--exclude=*/Steam/*' \
+'--exclude=*/Dropbox/*' \
+'--exclude=*/Trash/*' \
 '--exclude=*/.m2/*' \
 '--exclude=*/.ivy2/*' \
 '--exclude=*/.netbeans/*' \
