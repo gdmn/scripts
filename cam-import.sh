@@ -3,7 +3,7 @@
 ## by dmn, http://devsite.pl
 
 
-DESTINATION="/mnt/domowe/foto"
+DESTINATION="/mnt/ram/ds/dom/foto"
 
 helpme() {
 	echo "$0 mv|cp file1 file2 file3...."
