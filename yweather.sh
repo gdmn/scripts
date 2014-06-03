@@ -52,20 +52,22 @@ cat >$TRANSFORMATION <<EOF
 		<xsl:value-of select="/rss/channel/yweather:units/@temperature"/>
 		<xsl:text>, </xsl:text>
 		<xsl:value-of select="yweather:condition/@text"/>
-		<xsl:text>, </xsl:text>
-		
-		<xsl:value-of select="/rss/channel/yweather:atmosphere/@pressure"/>
-		<xsl:value-of select="/rss/channel/yweather:units/@pressure"/>
-		<xsl:text> </xsl:text>
-			<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '0'">
-			<xsl:text></xsl:text>
-			</xsl:if>
-			<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '1'">
-			<xsl:text>rising</xsl:text>
-			</xsl:if>
-			<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '2'">
-			<xsl:text>falling</xsl:text>
-			</xsl:if>
+
+		<!-- not reliable pressure data from yahoo..
+			<xsl:text>, </xsl:text>		
+			<xsl:value-of select="/rss/channel/yweather:atmosphere/@pressure"/>
+			<xsl:value-of select="/rss/channel/yweather:units/@pressure"/>
+			<xsl:text> </xsl:text>
+				<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '0'">
+				<xsl:text></xsl:text>
+				</xsl:if>
+				<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '1'">
+				<xsl:text>rising</xsl:text>
+				</xsl:if>
+				<xsl:if test="/rss/channel/yweather:atmosphere/@rising = '2'">
+				<xsl:text>falling</xsl:text>
+				</xsl:if>
+		-->
 
 		<xsl:text></xsl:text>
 
@@ -83,8 +85,7 @@ cat >$TRANSFORMATION <<EOF
 		<xsl:value-of select="@text"/>
 		<xsl:text></xsl:text>
 	</xsl:template>
-	</xsl:stylesheet>
-
+</xsl:stylesheet>
 EOF
 # }}}
 
