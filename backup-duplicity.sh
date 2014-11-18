@@ -113,6 +113,8 @@ cat >$EXCLUDE_FILELIST <<EOF
 **/bak
 **/backup
 **/old
+**/temp
+**/Temp
 **/Steam
 **/SteamApps
 **/.thumbnails
@@ -153,7 +155,6 @@ cat >$EXCLUDE_FILELIST <<EOF
 **/*.mpv
 **/*.flv
 **/lost+found
-**/opt
 EOF
 }
 setup_excluded #}}}

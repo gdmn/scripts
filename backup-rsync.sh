@@ -57,7 +57,7 @@ echo "`date '+%A, %d %B %Y, %T'`" > /.backup-timestamp
 START=$(date +%s)
 $CMD \
 -e "/usr/bin/ssh -p22 -i /.id_rsa" \
-/ /home/dmn "$DEST" \
+/ /home/* "$DEST" \
 '--exclude=*/.hg/*' \
 '--exclude=*/.git/*' \
 '--exclude=*/.svn/*' \
