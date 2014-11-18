@@ -109,6 +109,7 @@ EOF
 #}}}
 cat >$EXCLUDE_FILELIST <<EOF
 **/*.bak
+**/*.log
 **/*~
 **/bak
 **/backup
