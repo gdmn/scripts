@@ -116,6 +116,7 @@ cat >$EXCLUDE_FILELIST <<EOF
 **/old
 **/temp
 **/Temp
+**/Thumbs.db
 **/Steam
 **/SteamApps
 **/.thumbnails
