@@ -15,3 +15,5 @@ while [[ "" != "$1" ]]; do
 	shift
 done
 
+echo 'CopyCmd Debug resync - if something went wrong'
+
