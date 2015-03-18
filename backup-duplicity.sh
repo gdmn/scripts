@@ -123,6 +123,7 @@ cat >$EXCLUDE_FILELIST <<EOF
 **/.dropbox
 **/Desktop
 **/Downloads
+**/Downloaded
 **/Cache
 **/.cache
 **/cache
