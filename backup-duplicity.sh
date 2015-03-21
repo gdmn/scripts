@@ -158,6 +158,7 @@ cat >$EXCLUDE_FILELIST <<EOF
 **/*.mpv
 **/*.flv
 **/lost+found
+**/.vagrant.d
 EOF
 }
 setup_excluded #}}}
