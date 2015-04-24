@@ -11,7 +11,9 @@ fi
 
 qemu-system-x86_64 -enable-kvm -machine type=pc,accel=kvm \
 -cpu host \
+-vga vmware \
 -localtime -boot d -m 1024 -cdrom $*
+#http://rozie.blox.pl/2012/09/Alternatywa-dla-VirtualBox-AQEMU.html
 
 #-usbdevice tablet -soundhw ac97 \
 #-vga vmware \
