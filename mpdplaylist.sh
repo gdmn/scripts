@@ -96,7 +96,6 @@ parse() {
 		if [[ $head1 == ?\ HTTP/1.?\ 200\ * ]] ; then
 			debug 'i do not know yet'
 			parse_head "$1" "$head"
-			#$curl "$1" | parse_playlist
 		else
 			debug probably stream
 			found "$1"
