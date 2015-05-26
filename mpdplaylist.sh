@@ -67,11 +67,29 @@ parse() {
 			found "$1"
 		fi
 	}
-	
+
+	strip_redirects() {
+		local head="$1"
+		local begins=`echo "$head" | grep HTTP/1 | wc -l`
+		if [ "$begins" -gt 1 ]; then
+			debug "stripping redirects, found $begins"
+			local result=''
+			local count=0
+			while [[ `echo "$result" | head -n 1` != *HTTP/1.?\ * ]]; do
+				count=$(( $count + 1 ))
+				result=`echo "$head" | tail -n $count`
+			done
+			echo "$result"
+		else
+			echo "$head"
+		fi
+	}
+
 	buggy_head() {
 		local temp=`mktemp`
 		$curl -v "$1" 2>$temp | dd count=0 2>/dev/null
 		local head=`cat $temp`
+		head=`strip_redirects "$head"`
 		rm -f $temp
 
 		local head1=`echo "$head" | grep HTTP/1 | tail -n 1` # because of redirections
@@ -93,6 +111,7 @@ parse() {
 		head=`$curl --head "$1"`
 		returned="$?"
 		debug " # $curl --head $1 --> $returned"
+		head=`strip_redirects "$head"`
 		if [[ $returned -eq 52 || $returned -eq 56 ]]; then
 			# sometimes icecast returns CURLE_GOT_NOTHING (52)
 			# sometimes servers do not accept head requests... :/
