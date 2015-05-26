@@ -42,9 +42,9 @@ parse() {
 		local head="$2"
 		echo "$head" | grep -i 'content-type:' | grep -i 'text/html' >/dev/null 2>&1
 		local html=$?
-		echo "$head" | grep -i 'content-length:' >/dev/null 2>&1 # streams does not have content length
+		echo "$head" | grep -i 'content-length:' >/dev/null 2>&1 # streams do not have content length
 		local contentlength=$?
-		echo "$head" | grep -i 'content-disposition:' | grep -i 'attachment' >/dev/null 2>&1 # playlist sometimes are attachments
+		echo "$head" | grep -i 'content-disposition:' >/dev/null 2>&1 # playlist sometimes are attachments
 		local attachment=$?
 
 		debug "html? $html, contentlength? $contentlength, attachment? $attachment"
@@ -93,7 +93,7 @@ parse() {
 		head=`$curl --head "$1"`
 		returned="$?"
 		debug " # $curl --head $1 --> $returned"
-		if [ $returned -eq 52 ]; then
+		if [[ $returned -eq 52 || $returned -eq 56 ]]; then
 			# sometimes icecast returns CURLE_GOT_NOTHING (52)
 			# sometimes servers do not accept head requests... :/
 			buggy_head "$1"
@@ -135,6 +135,9 @@ examples:
 	`basename $0` -c echo http://www.house-radio.com/
 	`basename $0` -c echo http://www.prw.pl/rds/info/pos%C5%82uchaj-radia
 	`basename $0` -c echo http://www.listenlive.eu/poland.html
+	`basename $0` http://yp.shoutcast.com/sbin/tunein-station.pls?id=327746
+	`basename $0` http://dir.xiph.org/listen/493689/listen.m3u
+	`basename $0` http://dir.xiph.org/listen/236666/listen.m3u
 EOF
 		;;
 		-v|--verbose)
