@@ -24,6 +24,8 @@ if [ "$#" != "1" ]; then
 fi
 
 mkdir -p "${POINT}/${1}"
+chown $FORCEUID "${POINT}"
+chown $FORCEUID "${POINT}/${1}"
 
 sudo mount.cifs -o "credentials=${PWDFILE},iocharset=utf8,rw,noauto,uid=${FORCEUID},gid=${FORCEGID},forceuid,forcegid,user,suid" "//${IP}/${1}" "${POINT}/${1}" && \
 	echo "Mounted in ${POINT}/${1}"
