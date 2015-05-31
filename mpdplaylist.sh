@@ -2,9 +2,8 @@
 
 ## by dmn, http://devsite.pl
 
-# DI.FM:
+# DI.FM (http://mpd.wikia.com/wiki/Hack:di.fm-playlists):
 # wget -q -O - http://listen.di.fm/public3 | sed 's/},{/\n/g' | perl -n -e '/"key":"([^"]*)".*"playlist":"([^"]*)"/; print "$1\n"; open(F, ">di_$1.m3u"); $s = $2; $s =~ s/\\\//\//g;print F "$s"; close(F);'
-# based on: http://mpd.wikia.com/wiki/Hack:di.fm-playlists
 
 curl='curl --location --connect-timeout 4 --silent'
 verbose=false
@@ -24,7 +23,8 @@ found() {
 
 parse() {
 	parse_playlist () {
-		grep '/' | sed 's/$//g' | while read k; do
+		grep '/' | sed 's/
+$//g' | while read k; do
 			debug " > read $k"
 			if [[ $k == HTTP* ]] ; then
 				parse "$k"
@@ -137,7 +137,7 @@ while [[ $# > 0 ]]; do
 	case "$arg" in
 		-h|--help)
 			cat <<EOF
-`basename $0` by dmn - parse playlists url
+`basename $0` by dmn - parse playlists, playlist urls, plain htmls and add them to MPD.
 arguments:
 	-h|--help - help
 	-v|--verbose - debug output
