@@ -23,8 +23,7 @@ found() {
 
 parse() {
 	parse_playlist () {
-		grep '/' | sed 's/
-$//g' | while read k; do
+		grep '/' | sed 's/$//g' | while read k; do
 			debug " > read $k"
 			if [[ $k == HTTP* ]] ; then
 				parse "$k"
