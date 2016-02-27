@@ -11,7 +11,8 @@ if pidof openvpn > /dev/null 2>&1; then
 fi
 #wget -q -O - "http://static.devsite.pl/ip.php"
 #curl http://www.whatismyip.org
-curl --silent --insecure "https://devsite.pl/tools/ip.php"
+#curl --silent --insecure "https://devsite.pl/tools/ip.php"
+curl "https://api.ipify.org/"
 exit
 
 ==========================================================================================
