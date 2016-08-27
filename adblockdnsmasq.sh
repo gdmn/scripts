@@ -46,7 +46,7 @@ filter_dnsmasq() {
 filter_nocomments() {
 	while read line; do
 		case "$line" in
-			'#'* )
+			*'#'* )
 				;;
 			*'local'* )
 				;;
