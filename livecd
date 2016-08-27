@@ -5,6 +5,7 @@
 MACHINENAME='livecd'
 # get version of vbox, e.g. 4.2.4-1
 VIRTUALBOX_VERSION=$(pacman -Q virtualbox|awk {'print $2'}|sed 's/\-.\+//')
+VIRTUALBOX_VERSION="${VIRTUALBOX_VERSION}_OSE"
 # get version of kernel, e.g. 3.6.5-1-ck/x86_64
 KERNEL_VERSION=$(uname -rm|sed 's/\ /\//')
 
@@ -14,7 +15,8 @@ else
 	echo "Virtualbox version = $VIRTUALBOX_VERSION, kernel version = $KERNEL_VERSION"
 	echo 'Running: sudo modprobe vboxdrv'
 	sudo modprobe vboxdrv || ( \
-		echo 'Running: sudo install install vboxhost' && \
+		echo 'Running: sudo dkms install' && \
+		sudo dkms autoinstall;
 		sudo dkms install vboxhost/$VIRTUALBOX_VERSION -k $KERNEL_VERSION && \
 		sudo modprobe vboxdrv )
 fi

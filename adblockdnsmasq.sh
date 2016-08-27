@@ -1,9 +1,13 @@
 #! /usr/bin/env bash
 
+IP=0.0.0.0
+
 filter_hosts_hosts() {
 	while read line; do
 		if [[ "$line" =~ "127.0.0.1 "* ]] ; then
-			echo "${line}"
+			echo "$IP ${line//* /}"
+		elif [[ "$line" =~ "0.0.0.0 "* ]] ; then
+			echo "$IP ${line//* /}"
 		fi
 	done
 }
@@ -13,7 +17,7 @@ filter_dnsmasq_hosts() {
 		if [[ "$line" =~ "address=/"* ]] ; then
 			 line="${line//*=\//}"
 			 line="${line//\/*/}"
-			 echo "127.0.0.1 ${line}"
+			 echo "$IP ${line}"
 		fi
 	done
 }
@@ -21,7 +25,10 @@ filter_dnsmasq_hosts() {
 filter_hosts() {
 	while read line; do
 		if [[ "$line" =~ "127.0.0.1 "* ]] ; then
-			echo "address=/${line//* /}/127.0.0.1"
+			echo "address=/${line//* /}/$IP"
+		fi
+		if [[ "$line" =~ "0.0.0.0 "* ]] ; then
+			echo "address=/${line//* /}/$IP"
 		fi
 	done
 }
@@ -29,7 +36,9 @@ filter_hosts() {
 filter_dnsmasq() {
 	while read line; do
 		if [[ "$line" =~ "address=/"* ]] ; then
-			echo "${line//* /}"
+			line="${line//*=\//}"
+            line="${line//\/*/}"
+            echo "address=/${line//* /}/$IP"
 		fi
 	done
 }
@@ -55,6 +64,10 @@ fetch_hosts() {
 	for u in 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=dnsmasq&showintro=0&mimetype=plaintext' ; do
 		curl --silent "$u" | filter_nocomments | filter_dnsmasq_hosts
 	done
+    
+    for u in 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts' ; do
+		curl --silent "$u" | filter_nocomments | filter_hosts_hosts
+	done
 }
 
 fetch() {
@@ -64,6 +77,10 @@ fetch() {
 
 	for u in 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=dnsmasq&showintro=0&mimetype=plaintext' ; do
 		curl --silent "$u" | filter_nocomments | filter_dnsmasq
+	done
+
+    for u in 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts' ; do
+		curl --silent "$u" | filter_nocomments | filter_hosts
 	done
 }
 
