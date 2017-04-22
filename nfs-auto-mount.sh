@@ -14,7 +14,7 @@ printf %s "$NET_MOUNTS" | while IFS= read -r line
 do
 	SERVER=$(echo $line | cut -f1 -d":")
 	MOUNT_POINT=$(echo $line | cut -f2 -d" ")
-	echo "server: $SERVER, mnt: $MOUNT_POINT"
+	#echo "server: $SERVER, mnt: $MOUNT_POINT"
 
 	# Check if server already tested
 	if [[ "${server_ok[@]}" =~ "${SERVER}" ]]; then
