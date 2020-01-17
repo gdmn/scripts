@@ -20,11 +20,11 @@ processfile() {
 	if [[ "" != $TEXT ]]; then
 		#TEXT="$TEXT [$CREATED]"
 		# -strip --> usunięcie EXIF
-		convert "$1" -resize "${PX}x${PX}" -quality "${QUALITY}%" -font 'Droid Sans' -pointsize 18 -draw "gravity SouthEast
+		convert "$1" -strip -resize "${PX}x${PX}" -quality "${QUALITY}%" -font 'Droid Sans' -pointsize 18 -draw "gravity SouthEast
 fill black text 12,12 '$TEXT'
 fill white text 10,10 '$TEXT'" "${NEWNAME}"
 	else
-		convert "$1" -resize "${PX}x${PX}" -quality "${QUALITY}%" "${NEWNAME}"
+		convert "$1" -strip -resize "${PX}x${PX}" -quality "${QUALITY}%" "${NEWNAME}"
 	fi
 }
 

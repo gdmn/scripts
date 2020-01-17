@@ -12,6 +12,7 @@ fi
 #wget -q -O - "http://static.devsite.pl/ip.php"
 #curl http://www.whatismyip.org
 #curl --silent --insecure "https://devsite.pl/tools/ip.php"
+#curl -s zx2c4.com/ip|head -n 1
 curl "https://api.ipify.org/"
 exit
 
