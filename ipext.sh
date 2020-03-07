@@ -13,7 +13,7 @@ fi
 #curl http://www.whatismyip.org
 #curl --silent --insecure "https://devsite.pl/tools/ip.php"
 #curl -s zx2c4.com/ip|head -n 1
-curl "https://api.ipify.org/"
+curl --silent "https://api.ipify.org/"
 exit
 
 ==========================================================================================
