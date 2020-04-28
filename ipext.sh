@@ -13,7 +13,9 @@ fi
 #curl http://www.whatismyip.org
 #curl --silent --insecure "https://devsite.pl/tools/ip.php"
 #curl -s zx2c4.com/ip|head -n 1
-curl --silent "https://api.ipify.org/"
+#curl --silent "https://api.ipify.org/"
+dig +short myip.opendns.com @resolver1.opendns.com
+#dig TXT +short o-o.myaddr.l.google.com @ns1.google.com
 exit
 
 ==========================================================================================
