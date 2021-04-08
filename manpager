@@ -1,7 +1,0 @@
-#! /bin/sh
-
-## http://www.miek.nl/blog/archives/2013/01/19/vim_as_manpager/index.html
-#export MANPAGER=/home/miekg/bin/manpager
-
-
-col -b | view -c 'set ft=man nomod nolist' -c 'map q <ESC>:quit!<CR>' -

@@ -1,1 +1,0 @@
-../../opt/btsync/btsyncstart.sh

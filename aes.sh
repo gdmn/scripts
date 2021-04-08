@@ -6,11 +6,12 @@
 usage() {
 	echo -e "Usage examples:\n"
 	echo -e "encrypt: \tPASSWORD=abc `basename $0` -e somefile anotherfile directory/"
-	echo -e "decrypt: \tPASSWORD=abc `basename $0` -d encrypted.tar.aes"
-	echo -e "list:    \tPASSWORD=abc `basename $0` -l encrypted.tar.aes"
+	echo -e "decrypt: \tPASSWORD=abc `basename $0` -d encrypted.zstd.tar.aes"
+	echo -e "list:    \tPASSWORD=abc `basename $0` -l encrypted.zstd.tar.aes"
 	echo ""
 	echo "Arguments:"
 	echo -e "\t-e  \t--encrypt     \tencrypt given file(s) to current directory or file specified with \"-o\" argument"
+	echo -e "\t-x  \t--sfx         \tcreate self extracting encrypted archive"
 	echo -e "\t-d  \t--decrypt     \tdecrypt given file(s) to current directory"
 	echo -e "\t-l  \t--list        \tlist content of the file"
 	echo -e "\t-r  \t--random      \tgenerate random password for encrypt"
@@ -28,18 +29,19 @@ if [[ "" == "`which openssl`" ]]; then
 	echo 'install openssl!'
 	exit 3
 fi
-if [[ "" == "`which pv`" ]]; then
-	echo 'install pv (pipeviewer)!'
+if [[ "" == "`which zstd`" ]]; then
+	echo 'install zstd (zstandard compression)!'
 	exit 3
 fi
 
 PASSWORD="${PASSWORD}"
 GENERATEINFO=
-#OUTPUTFILE=
-OUTPUTFILE="`pwd`/encrypted_`date +%Y%m%d_%H%M%S`.tar.aes"
+OUTPUTFILE="`pwd`/encrypted_`date +%Y%m%d_%H%M%S`.zstd.tar.aes"
 INFOFILE="${OUTPUTFILE}.info"
 PASSWORDARGUMENTS=
-CRYPTARGUMENTS="aes-256-cbc -salt"
+CRYPTARGUMENTS="enc -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt"
+COMPRESS="zstd -T0 --long --stdout"
+DECOMPRESS="zstd -d --stdout"
 
 ########################################################################
 # CLEANUP
@@ -74,13 +76,39 @@ encrypt() {
 		echo "Result: ${OUTPUTFILE}"
 	fi
 
-	SIZE=$( du -scb $* | tail -1 | awk '{print $1}' )
-	tar -cf - $* | \
-		pv -s $SIZE | \
-		gzip | \
+	tar --checkpoint=1000 --checkpoint-action=dot -cf - $* | \
+		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
-		dd of=${OUTPUTFILE}
+				dd of=${OUTPUTFILE}
+}
+
+encrypt_sfx() {
+	cd .
+	if [[ "1" == "${GENERATEINFO}" ]]; then
+		echo "Result: ${OUTPUTFILE} with ${INFOFILE}" | tee -a ${INFOFILE}
+	else
+		echo "Result: ${OUTPUTFILE}"
+	fi
+
+cat > ${OUTPUTFILE} <<SCRIPT_TOP
+#!/bin/bash
+
+echo -n "Extracting... "
+sta=\$((\`grep -an "^EOS$" \$0 | cut -d: -f1\` + 1))
+tail -n+\${sta} \$0 | openssl ${CRYPTARGUMENTS} -d | zstd -d --stdout | tar -x --checkpoint=1000 --checkpoint-action=dot
+exit 0
+EOS
+SCRIPT_TOP
+
+	tar --checkpoint=1000 --checkpoint-action=dot -cf - $* | \
+		$COMPRESS | \
+		R="${PASSWORD}" \
+				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
+				dd oflag=append conv=notrunc of=${OUTPUTFILE}
+
+	mv "${OUTPUTFILE}" "${OUTPUTFILE}.sh"
+	chmod +x "${OUTPUTFILE}.sh"
 }
 
 ########################################################################
@@ -88,11 +116,12 @@ encrypt() {
 
 decrypt() {
 	while [[ "$1" ]]; do
-		echo "Decrypting of $1"
-		pv "$1" | \
+		echo "Decrypting $1"
+		cat "$1" | \
 			R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} -d ${PASSWORDARGUMENTS} | \
-			tar -zx
+				$DECOMPRESS | \
+				tar --checkpoint=1000 --checkpoint-action=dot -x
 		shift
 	done
 }
@@ -102,11 +131,12 @@ decrypt() {
 
 list() {
 	while [[ "$1" ]]; do
-		echo "Listing of $1"
+		echo "Listing $1"
 		cat "$1" | \
 			R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} -d ${PASSWORDARGUMENTS} | \
-			tar -zt
+				$DECOMPRESS | \
+				tar -t
 		shift
 	done
 }
@@ -147,6 +177,15 @@ while [[ "$1" ]]; do
 		-e | --encrypt)
 			shift
 			CMD='encrypt'
+			if [[ ("$1" == "") ]]; then
+				usage
+				exit 1
+			fi
+			break
+		;;
+		-x | --sfx)
+			shift
+			CMD='encrypt_sfx'
 			if [[ ("$1" == "") ]]; then
 				usage
 				exit 1
