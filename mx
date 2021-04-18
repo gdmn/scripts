@@ -5,9 +5,10 @@
 # ~/bin/tmux-myproject shell script
 # The Project name is also used as a session name (usually shorter)
 
-if [ $# -ne 1 ] ; then
+if [ $# -lt 1 ] ; then
+	echo -e 'Attach to existing tmux session or create new one. Optionally run command inside the session.\n'
 	echo 'Usage:'
-	echo "$0 name"
+	echo "$0 name [command]"
 	echo ''
 	echo 'List sessions:'
 	tmux list-sessions
@@ -15,10 +16,12 @@ if [ $# -ne 1 ] ; then
 fi
 
 NAME="$1"
+shift
+JUST_CREATED="x"
 
 tmux has-session -t "$NAME" 2>/dev/null
 if [ "$?" -eq 1 ] ; then
-	echo "No Session found. Creating and configuring."
+	echo "Session not found, creating and configuring..."
 	tmux -2 new-session -d -s "$NAME"
 	CONF="${HOME}/.tmux-${NAME}.conf"
 	if [ -f $CONF ]; then
@@ -26,11 +29,27 @@ if [ "$?" -eq 1 ] ; then
 		tmux source-file "${HOME}/.tmux.conf"
 		tmux source-file "${CONF}"
 	else
-		echo "Configuration ${CONF} not found."
+		echo "Configuration ${CONF} not found"
 	fi
+	JUST_CREATED="yes"
 else
-	echo "Session found."
+	echo "Session found"
 fi
 
-echo "Connecting."
+if [ $# -gt 0 ]; then
+	echo "Running \`$*\` inside tmux..."
+	if [ "$JUST_CREATED" == "yes" ]; then
+		tmux new-window -t "$NAME:123" $*
+		# kill already created window with shell
+		# caveat: don't assume its number is 0
+		tmux swap-window -t "$NAME:123" -s "$NAME:1" 2>/dev/null
+		tmux swap-window -t "$NAME:123" -s "$NAME:0" 2>/dev/null
+		tmux kill-window -t "$NAME:123"
+	else
+		tmux new-window -t "$NAME" $*
+	fi
+fi
+
+echo "Attaching session..."
 tmux -2 attach-session -t "$NAME"
+
