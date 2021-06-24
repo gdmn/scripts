@@ -9,6 +9,22 @@ ips_nmap=`ip -family inet -oneline address | grep -v '127.0.0' | grep -v 'inet 1
 
 echo "ips: \"${ips}\""
 
+lsips() {
+	let x=1
+	while [ $x -lt "255" ]; do
+		echo "${1}${x}"
+		let x++
+	done
+}
+
+for ip in $ips ; do
+	lsips "${ip}"
+done | \
+	parallel --timeout 2 -j0 \
+		'ping -W 1 -c 1 {} >/dev/null && echo {}'
+
+exit 0
+
 for ip in $ips ; do
 	x=1
 	echo "scanning ${ip}0/24"
