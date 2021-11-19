@@ -6,8 +6,8 @@
 usage() {
 	echo -e "Usage examples:\n"
 	echo -e "encrypt: \tPASSWORD=abc `basename $0` -e somefile anotherfile directory/"
-	echo -e "decrypt: \tPASSWORD=abc `basename $0` -d encrypted.zstd.tar.aes"
-	echo -e "list:    \tPASSWORD=abc `basename $0` -l encrypted.zstd.tar.aes"
+	echo -e "decrypt: \tPASSWORD=abc `basename $0` -d encrypted.tar.zstd.aes"
+	echo -e "list:    \tPASSWORD=abc `basename $0` -l encrypted.tar.zstd.aes"
 	echo ""
 	echo "Arguments:"
 	echo -e "\t-e  \t--encrypt     \tencrypt given file(s) to current directory or file specified with \"-o\" argument"
@@ -36,7 +36,7 @@ fi
 
 PASSWORD="${PASSWORD}"
 GENERATEINFO=
-OUTPUTFILE="`pwd`/encrypted_`date +%Y%m%d_%H%M%S`.zstd.tar.aes"
+OUTPUTFILE="`pwd`/encrypted_`date +%Y%m%d_%H%M%S`.tar.zstd.aes"
 INFOFILE="${OUTPUTFILE}.info"
 PASSWORDARGUMENTS=
 CRYPTARGUMENTS="enc -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt"
@@ -76,7 +76,15 @@ encrypt() {
 		echo "Result: ${OUTPUTFILE}"
 	fi
 
-	tar --checkpoint=1000 --checkpoint-action=dot -cf - $* | \
+	local tarStream=
+	if [[ $# -eq 1 ]] && [[ $1 == *.tar ]]; then
+		tarStream="cat "$1""
+		echo "Detected only one argument which looks like a tar archive. Not calling tar command on it."
+	else
+		tarStream="tar --checkpoint=1000 --checkpoint-action=dot -cf - $*"
+	fi
+
+	$tarStream | \
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
@@ -101,7 +109,15 @@ exit 0
 EOS
 SCRIPT_TOP
 
-	tar --checkpoint=1000 --checkpoint-action=dot -cf - $* | \
+	local tarStream=
+	if [[ $# -eq 1 ]] && [[ $1 == *.tar ]]; then
+		tarStream="cat "$1""
+		echo "Detected only one argument which looks like a tar archive. Not calling tar command on it."
+	else
+		tarStream="tar --checkpoint=1000 --checkpoint-action=dot -cf - $*"
+	fi
+
+	$tarStream | \
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
