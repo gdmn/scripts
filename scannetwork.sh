@@ -17,11 +17,19 @@ lsips() {
 	done
 }
 
-for ip in $ips ; do
-	lsips "${ip}"
-done | \
-	parallel --timeout 2 -j0 \
-		'ping -W 1 -c 1 {} >/dev/null && echo {}'
+if [[ "--ssh" == "$1" ]]; then
+    for ip in $ips ; do
+        lsips "${ip}"
+    done | \
+        parallel --timeout 2 -j0 \
+            'ping -W 1 -c 1 {} >/dev/null && echo -e "\033[1;32m{}\033[0m" && ssh-keyscan {} 2>/dev/null | while read k; do key="${k//* /}"; grep "$key" ~/.ssh/known_hosts  ; done'
+else 
+    for ip in $ips ; do
+        lsips "${ip}"
+    done | \
+        parallel --timeout 2 -j0 \
+            'ping -W 1 -c 1 {} >/dev/null && echo {}'
+fi
 
 exit 0
 
