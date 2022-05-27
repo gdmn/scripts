@@ -64,6 +64,10 @@ configure_other() {
 #
 
 echo "Monitoring $eth0"
+
+sleep 1
+configure_other "$eth0"
+
 ip monitor dev $eth0 | \
     while read k; do \
         if echo "$k" | grep 'table local proto kernel scope host src' >/dev/null 2>&1; then \
