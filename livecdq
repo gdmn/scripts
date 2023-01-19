@@ -8,12 +8,18 @@ else
 	echo 1 | sudo tee /sys/kernel/mm/ksm/run > /dev/null
 fi
 
+if [ "$(cat /sys/kernel/mm/ksm/run || echo 1)" -eq "0" ] ; then
+    # https://wiki.archlinux.org/title/QEMU#Tips_and_tricks
+    echo "Enabling kernel same-page merging"
+    echo 1 | sudo tee /sys/kernel/mm/ksm/run > /dev/null
+fi
 
-qemu-system-x86_64 -enable-kvm -machine type=pc,accel=kvm \
--cpu host \
--vga vmware \
--boot d -m 1024 -cdrom $*
-#http://rozie.blox.pl/2012/09/Alternatywa-dla-VirtualBox-AQEMU.html
+qemu-system-x86_64 -enable-kvm -machine type=pc \
+-cpu host -smp 2 \
+-m 4096 -device virtio-balloon \
+-vga qxl \
+-usb -device usb-tablet \
+-boot d -cdrom "$@"
 
 #-usbdevice tablet -soundhw ac97 \
 #-vga vmware \
