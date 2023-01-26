@@ -22,7 +22,9 @@ fi
 mkarchive() {
 	cd .
 
-	tar --checkpoint=1000 --checkpoint-action=dot -cf - $* | \
+    # checkpoint is not supported on freebsd
+	#tar --checkpoint=1000 --checkpoint-action=dot
+	tar -cf - $* | \
 		zstd -T0 --long -o "${OUTPUTFILE}"
 }
 
