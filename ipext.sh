@@ -6,16 +6,20 @@
 # echo `wget -q -O - "http://showip.net/simple_ip.php?from_widget=1"`
 #wget -q -O - "http://showip.net/simple_ip.php?from_widget=1"
 
-if pidof openvpn > /dev/null 2>&1; then
-	echo -n 'vpn:'
+if command -v dig >/dev/null 2>&1; then
+    dig +short myip.opendns.com @resolver1.opendns.com
+else
+    #echo "$(curl --silent 'https://api.ipify.org/')"
+    echo "$(curl --silent zx2c4.com/ip|head -n 1)"
 fi
-#wget -q -O - "http://static.devsite.pl/ip.php"
-#curl http://www.whatismyip.org
-#curl --silent --insecure "https://devsite.pl/tools/ip.php"
-#curl -s zx2c4.com/ip|head -n 1
-#curl --silent "https://api.ipify.org/"
-dig +short myip.opendns.com @resolver1.opendns.com
 #dig TXT +short o-o.myaddr.l.google.com @ns1.google.com
+
+if command -v docker >/dev/null 2>&1; then
+    if [ "$(docker inspect -f '{{.State.Running}}' gluetun 2>/dev/null)" = "true" ]; then 
+        echo "gluetun vpn:$(docker exec gluetun cat /tmp/gluetun/ip)"
+    fi
+fi
+
 exit
 
 ==========================================================================================
