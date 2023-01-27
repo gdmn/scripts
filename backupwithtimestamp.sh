@@ -24,7 +24,7 @@ mkarchive() {
 
     # checkpoint is not supported on freebsd
 	#tar --checkpoint=1000 --checkpoint-action=dot
-	tar -cf - $* | \
+	tar -cf - "$@" | \
 		zstd -T0 --long -o "${OUTPUTFILE}"
 }
 
@@ -41,6 +41,6 @@ fi
 
 shift
 
-mkarchive $*
+mkarchive "$@"
 
 echo -e "To decompress, run: zstd -dc $OUTPUTFILE | tar -x -C outputdirectory/"
