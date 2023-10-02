@@ -14,10 +14,12 @@ if [ "$(cat /sys/kernel/mm/ksm/run || echo 1)" -eq "0" ] ; then
     echo 1 | sudo tee /sys/kernel/mm/ksm/run > /dev/null
 fi
 
+#-vga qxl
+
 qemu-system-x86_64 -enable-kvm -machine type=pc \
 -cpu host -smp 2 \
 -m 4096 -device virtio-balloon \
--vga qxl \
+-vga virtio -display sdl,gl=on \
 -usb -device usb-tablet \
 -boot d -cdrom "$@"
 
