@@ -68,7 +68,7 @@ route_to() {
     local s="$1"
     echo "Routing applications to $s"
     #pactl list short sink-inputs | sed -r 's/([0-9]+).*/\1/' | while read appId; do pactl move-sink-input $appId "$s"; done
-    paste -d '' - - < <(pactl list sink-inputs | grep -e "Sink Input" -e "application.process.binary") | sed -r 's/.*#([0-9]+).*binary.*"([[:alnum:]]+)".*/\1 \2/' | while read appId appName; do
+    paste -d '' - - < <(pactl list sink-inputs | grep -e "Sink Input" -e "application\.name") | sed -r 's/.*#([0-9]+).*name.*"(.+)".*/\1 \2/' | while read appId appName; do
         echo "Routing $appName (id $appId) to $s"
         pactl move-sink-input $appId "$s"
     done
