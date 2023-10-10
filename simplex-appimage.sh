@@ -9,7 +9,7 @@ icon="$share/icons/simplex.svg"
 #icon_url='https://raw.githubusercontent.com/simplex-chat/simplex-chat/stable/apps/multiplatform/common/src/commonMain/resources/distribute/simplex.png'
 #icon_url='https://raw.githubusercontent.com/simplex-chat/website/master/app-demo/assets/assets/simpleX.png'
 icon_url='https://raw.githubusercontent.com/simplex-chat/simplex-chat/stable/website/src/img/new/logo-symbol-light.svg'
-url="$(curl -sL https://api.github.com/repos/simplex-chat/simplex-chat/releases | grep AppImage | grep x86_64 | grep https: | head -n 1 | sed -E 's/.+https(.+)AppImage.*/https\1AppImage/')"
+url="$(curl -sL https://api.github.com/repos/simplex-chat/simplex-chat/releases | grep AppImage | grep x86_64 | grep https: | grep browser_download_url | sort | tail -n 1 | sed -E 's/.+https(.+)AppImage.*/https\1AppImage/')"
 
 echo "Downloading $url to $dest"
 curl -sSL -z "$dest" "$url" -o "$dest"
