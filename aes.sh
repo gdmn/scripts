@@ -78,13 +78,13 @@ encrypt() {
 
 	local tarStream=
 	if [[ $# -eq 1 ]] && [[ $1 == *.tar ]]; then
-		tarStream="cat "$1""
+		tarStream="cat"
 		echo "Detected only one argument which looks like a tar archive. Not calling tar command on it."
 	else
-		tarStream="tar --checkpoint=1000 --checkpoint-action=dot -cf - $*"
+		tarStream="tar --owner=0 --group=0 --checkpoint=1000 --checkpoint-action=dot -cf -"
 	fi
 
-	$tarStream | \
+	$tarStream "$@" | \
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
@@ -111,13 +111,13 @@ SCRIPT_TOP
 
 	local tarStream=
 	if [[ $# -eq 1 ]] && [[ $1 == *.tar ]]; then
-		tarStream="cat "$1""
+		tarStream="cat"
 		echo "Detected only one argument which looks like a tar archive. Not calling tar command on it."
 	else
-		tarStream="tar --checkpoint=1000 --checkpoint-action=dot -cf - $*"
+		tarStream="tar --owner=0 --group=0 --checkpoint=1000 --checkpoint-action=dot -cf -"
 	fi
 
-	$tarStream | \
+	$tarStream "$@" | \
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
@@ -240,7 +240,7 @@ if [[ $CMD ]]; then
 	if [[ "${PASSWORD}" == "" ]]; then
 		echo "Note, that you can assign \${PASSWORD} environment variable"
 	fi
-	$CMD $*
+	$CMD "$@"
 	RESULT=$?
 	echo "Result of ${CMD}: ${RESULT}"
 	exit $RESULT
