@@ -10,7 +10,7 @@ if command -v dig >/dev/null 2>&1; then
     dig +short myip.opendns.com @resolver1.opendns.com
 else
     #echo "$(curl --silent 'https://api.ipify.org/')"
-    echo "$(curl --silent zx2c4.com/ip|head -n 1)"
+    echo "$(curl --silent ifconfig.co||curl --silent zx2c4.com/ip|head -n 1)"
 fi
 #dig TXT +short o-o.myaddr.l.google.com @ns1.google.com
 
