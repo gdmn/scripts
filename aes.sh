@@ -88,7 +88,7 @@ encrypt() {
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
-				dd of=${OUTPUTFILE}
+				dd bs=1M of=${OUTPUTFILE}
 }
 
 encrypt_sfx() {
@@ -121,7 +121,7 @@ SCRIPT_TOP
 		$COMPRESS | \
 		R="${PASSWORD}" \
 				openssl ${CRYPTARGUMENTS} ${PASSWORDARGUMENTS} | \
-				dd oflag=append conv=notrunc of=${OUTPUTFILE}
+				dd bs=1M oflag=append conv=notrunc of=${OUTPUTFILE}
 
 	mv "${OUTPUTFILE}" "${OUTPUTFILE}.sh"
 	chmod +x "${OUTPUTFILE}.sh"
