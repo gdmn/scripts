@@ -14,7 +14,7 @@ fi
 
 echo "Destination: $dest"
 
-git ls-files . --exclude-standard --modified --others \
+(git diff --staged --name-only; git ls-files . --exclude-standard --modified --others) \
     | grep -v "stashed-.*\.tar\.zst" \
     | tar -cv -T - | zstd -19 --long -o "$dest"
 
