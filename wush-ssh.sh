@@ -28,7 +28,7 @@ key="$(cat $f | grep "$@" | tail -n 1 | sed -r 's/.+ //')"
 echo "key: $key"
 len=${#key}
 echo "length: $len"
-if [ $len -ne 91 ]; then
+if [ $len -lt 90 ] || [ $len -gt 92 ]; then
     echo "not found"
     exit 1
 fi

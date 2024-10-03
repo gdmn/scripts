@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-ENCRIPTION_PASS=
+ENCRYPTION_PASS=
 USER_PASS=
 URL=
 
@@ -9,11 +9,11 @@ if [ -e "/etc/wush-serve.conf" ]; then source "/etc/wush-serve.conf"; fi
 help_general() {
 cat <<EOF
 To use this script, you must set the credentials. Please edit them at the top of this file (${BASH_SOURCE[0]}) or in /etc/wush-serve.conf.
-- for self-hosted ntfy set \$USER_PASS and \$ENCRIPTION_PASS and \$URL
-- for public available ntfy.sh set \$ENCRIPTION_PASS and \$URL
+- for self-hosted ntfy set \$USER_PASS and \$ENCRYPTION_PASS and \$URL
+- for public available ntfy.sh set \$ENCRYPTION_PASS and \$URL
 
 Example configuration:
-ENCRIPTION_PASS=changeme
+ENCRYPTION_PASS=changeme
 URL='https://ntfy.sh/wushserve123'
 
 Install wush-serve to a host via ssh:
@@ -30,7 +30,7 @@ There are at least 2 ways to subscribe to topics.
 
 1. Run this script on a host where you want to be notified about auth keys:
 
-curl -s --no-buffer $URL/raw | while read l; do if [ -n "\$l" ] ; then echo "\$l" | openssl enc -d -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRIPTION_PASS" | tee -a ${XDG_CONFIG_HOME:-$HOME/.config}/notifications-wush; fi; done
+curl -s --no-buffer $URL/raw | while read l; do if [ -n "\$l" ] ; then echo "\$l" | openssl enc -d -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRYPTION_PASS" | tee -a ${XDG_CONFIG_HOME:-$HOME/.config}/notifications-wush; fi; done
 
 2. Configure subscriptions on a host where you want to be notified about auth keys.
 Two files must be created and the command must be run:
@@ -44,7 +44,7 @@ subscribe:
     if:
         tags: wush
     command: |
-        echo "\$message" | openssl enc -d -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRIPTION_PASS" | tee -a \${XDG_CONFIG_HOME:-$HOME/.config}/notifications-wush
+        echo "\$message" | openssl enc -d -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRYPTION_PASS" | tee -a \${XDG_CONFIG_HOME:-$HOME/.config}/notifications-wush
 
 - '~/.config/systemd/user/subscribe-wush.service':
 [Unit]
@@ -103,11 +103,11 @@ cat_me() {
     cat <<EOF
 #! /usr/bin/env bash
 
-ENCRIPTION_PASS=$ENCRIPTION_PASS
+ENCRYPTION_PASS=$ENCRYPTION_PASS
 USER_PASS=$USER_PASS
 URL=$URL
 EOF
-    cat "${BASH_SOURCE[0]}" | grep -ve '^URL=$' | grep -ve '^ENCRIPTION_PASS=$' | grep -ve '^USER_PASS=$' |grep -ve '^#!'
+    cat "${BASH_SOURCE[0]}" | grep -ve '^URL=$' | grep -ve '^ENCRYPTION_PASS=$' | grep -ve '^USER_PASS=$' |grep -ve '^#!'
 } # cat_me
 
 if [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -122,7 +122,7 @@ if [ "$1" = "cat" ] || [ "$1" = "--cat" ]; then
     exit 0
 fi
 
-if [ -z "$ENCRIPTION_PASS" ]; then
+if [ -z "$ENCRYPTION_PASS" ]; then
     help_general
     exit 1
 fi
@@ -169,7 +169,7 @@ TEMP_DIR="$(mktemp -d)"
 mkfifo $TEMP_DIR/auth
 
 notify() {
-  local content="$( echo "$@" | openssl enc -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRIPTION_PASS" )"
+  local content="$( echo "$@" | openssl enc -A -a -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k "$ENCRYPTION_PASS" )"
   if [ -n "$USER_PASS" ]; then
     curl \
         -Ss \
